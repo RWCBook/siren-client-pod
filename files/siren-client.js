@@ -28,19 +28,8 @@ function siren() {
   g.atype = "application/vnd.siren+json";
   g.title = "";
   g.context = "";
-  
-  // siren-sop object metadata
-  g.profile = {};
+  g.profile = {}; // siren-sop object metadata
 
-  // internal object metadata
-  /*
-  g.fields = {};
-  g.fields.home = [];
-  g.fields.task = ["id","title","tags","completeFlag","assignedUser"];
-  g.fields.user = ["nick","password","name"];
-  g.fields.error = ["code","message","title","url"];
-  */
-  
   // init library and start
   function init(url, title) {
 
@@ -57,18 +46,12 @@ function siren() {
 
   // primary loop
   function parseMsg() {
-    sirenClear();
-    title();
-    getContent();
-    dump();
-    links();
-    checkSOP();    
-  }
-
-  // see if we have object metadata
-  function checkSOP() {
     var profile;
     
+    sirenClear();
+    title();
+    dump();
+
     profile = getProfileLink();
     if(profile) {
       req(profile.href, "get", null, null, g.stype);
@@ -77,9 +60,11 @@ function siren() {
       parseSiren();
     }
   }
-  
+
   // finish parsing the siren response
   function parseSiren() {
+    getContent();
+    links();
     entities();
     properties();
     actions();
@@ -184,9 +169,9 @@ function siren() {
           d.push(a, dt);
           d.push(dt, dl);
 
-          // walk the items against the profile
           dd = d.node("dd");
           for(var prop in item) {
+            // only show properties from the profile
             if(sop[prop] && sop[prop].display===true) {
               p = d.data({
                 className:"item "+item.class.join(" "),
@@ -290,6 +275,7 @@ function siren() {
       
       coll = g.msg.properties;
       for(var prop in coll) { 
+        // only show properties from the profile
         if(sop[prop] && sop[prop].display===true) {
           p = d.data({
             className:"item "+g.msg.class.join(" ")||"",
@@ -335,8 +321,11 @@ function siren() {
     d.clear(elm);
     elm = d.find("content");
     d.clear(elm);
+    elm = d.find("error");
+    d.clear(elm);
   }
 
+  // find that sop profile link!
   function getProfileLink() {
     var coll, rtn;
     
@@ -351,7 +340,6 @@ function siren() {
     }
     return rtn;
   }
-  
 
   // ********************************
   // ajax helpers
