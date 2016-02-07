@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <!-- 
+  /*******************************************************
+   * siren-json HTML/SPA client engine 
+   * siren representor (server)
+   * June 2015
+   * Mike Amundsen (@mamund)
+   * Soundtrack : Motown Classics Gold (2005)
+   *******************************************************/
+  -->
+  <head>
+    <title>Siren</title>
+    <link href="siren-client.css" rel="stylesheet" />
+  </head>
+  <body>
+    <h1 id="title"></h1>
+    <div id="links"></div>
+    <div id="error"></div>
+    <div id="content"></div>
+    <div id="properties"></div>
+    <div id="entities"></div>
+    <div id="actions"></div>
+    <div>
+      <pre id="dump"></pre>
+    </div>
+  </body>
+  <script src="dom-help.js">//na</script>  
+  <script src="siren-client.js">//na </script>
+  <script>
+    window.onload = function() {
+      var pg = siren();
+      pg.init("/", "TPS - Task Processing System");
+    }
+  </script>
+</html>
