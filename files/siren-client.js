@@ -107,47 +107,48 @@ function siren() {
   // links
   function links() {
     var elm, coll;
+    var menu, a;
     
     elm = d.find("links");
     d.clear(elm);
 
     if(g.msg.links) {
-      ul = d.node("ul");
-      ul.onclick = httpGet;      
+      menu = d.node("div");
+      menu.className = "ui blue fixed top menu";
+      menu.onclick = httpGet;
       coll = g.msg.links;
       for(var link of coll) {
         // only render if NOT a "profile" link
         if(link.rel.indexOf("profile")===-1) {
-          li = d.node("li");
           a = d.anchor({
             rel:link.rel.join(" "),
             href:link.href,
             text:link.title||link.href, 
-            className:link.class.join(" "),
+            className:link.class.join(" ") + " item",
             type:link.type||""
           });
-          d.push(a, li);
-          d.push(li,ul);
+          d.push(a, menu);
         }
       }
-      d.push(ul, elm);
+      d.push(menu, elm);
     }
   }
 
   // entities
   function entities() {
     var elm, coll, cls, sop;
-    var ul, li, dl, dt, dd, a, p;
+    var segment, menu, a, table, tr_data;
     
     elm = d.find("entities");
     d.clear(elm);
     
     if(g.msg.entities) {
-      ul = d.node("ul");
       
       coll = g.msg.entities;
-      for(var item of coll) {   
-      
+      for(var item of coll) {
+        segment = d.node("div");
+        segment.className = "ui segment";
+
         // look up profile    
         cls = item.class[0];
         if(cls) {
@@ -156,65 +157,72 @@ function siren() {
         
         // if we have a profile...
         if(sop) {
-          li = d.node("li");
-          dl = d.node("dl");
-          dt = d.node("dt");
-          
+          menu = d.node("div");
+          menu.className = "ui mini buttons";
           a = d.anchor({
             href:item.href,
             rel:item.rel.join(" "),
-            className:item.class.join(" "),
+            className:item.class.join(" ") + " ui basic blue button",
             text:item.title||item.href});
           a.onclick = httpGet;
-          d.push(a, dt);
-          d.push(dt, dl);
+          d.push(a, menu);
+          d.push(menu, segment);
 
-          dd = d.node("dd");
+          table = d.node("table");
+          table.className = "ui table";
           for(var prop in item) {
             // only show properties from the profile
             if(sop[prop] && sop[prop].display===true) {
-              p = d.data({
+              tr_data = d.data_row({
                 className:"item "+item.class.join(" "),
                 text:sop[prop].prompt+"&nbsp;",
                 value:item[prop]+"&nbsp;"
               });
-              d.push(p,dd);
+              d.push(tr_data, table);
             }
           }
-          d.push(dd, dl);
-          d.push(dl, li);
-          d.push(li, ul);
+          d.push(table, segment);
         }
+        d.push(segment, elm);
       }
-      d.push(ul, elm);
+    }
+
+    if (elm.hasChildNodes()) {
+      elm.style.display = "block";
+    } else {
+      elm.style.display = "none";
     }
   }
   
   // actions  
   function actions() {
     var elm, coll;
-    var ul, li, frm, lg, fs, fld, inp, p;
+    var segment, frm, header, field, submit;
     
     elm = d.find("actions");
     d.clear(elm);
 
     if(g.msg.actions) {
       coll = g.msg.actions;
-      ul = d.node("ul");
+
       for(var act of coll) {
-        li = d.node("li");
+        segment = d.node("div");
+        segment.className = "ui green segment";
         frm = d.node("form");
+        frm.className = "ui form";
         frm.id = act.name;
         frm.setAttribute("smethod",act.method);
         frm.method = act.method;
         frm.action = act.href;
         frm.onsubmit = httpForm;
-        fs = d.node("fieldset");
-        lg = d.node("legend");
-        lg.innerHTML = act.title;
-        d.push(lg, fs);
+        header = d.node("div");
+        header.className = "ui dividing header";
+        header.innerHTML = act.title;
+        d.push(header, frm);
         for (var fld of act.fields) {
-          p = d.input({
+          field = d.node("p");
+          field.className = "inline field";
+          input = d.input({
             "prompt" : fld.title||fld.name,
             "name" : fld.name,
             "className" : fld.class.join(" "),
@@ -224,26 +232,24 @@ function siren() {
             "readOnly" : fld.readOnly||false,
             "pattern" : fld.pattern||""
           });
-          d.push(p,fs);                    
+          d.push(input, field);
+          d.push(field, frm);
         }
-        p = d.node("p");
-        inp = d.node("input");
-        inp.type = "submit";
-        d.push(inp, p);
-        d.push(p, fs);
-        
-        d.push(fs, frm);
-        d.push(frm, li);
-        d.push(li, ul);
+
+        submit = d.node("input");
+        submit.className = "ui positive mini submit button";
+        submit.type = "submit";
+        d.push(submit, frm);
+        d.push(frm, segment);
+        d.push(segment, elm);
       }
-      d.push(ul, elm);
     }
   }  
   
   // properties
   function properties() {
     var elm, coll, cls, sop;
-    var ul, dl, dt, dd, a, p;
+    var table, a, tr_data;
     
     elm = d.find("properties");
     d.clear(elm);
@@ -256,48 +262,52 @@ function siren() {
     }
     
     if(g.msg.properties) {
-      ul = d.node("ul");
-      dl = d.node("dl");
-      dd = d.node("dd");
+      table = d.node("table");
+      table.className = "ui table";
       
       if(cls==="error") {
         sop = {};
-        dt = d.node("dt");
         a = d.anchor({
           href:g.url,
           rel:"error",
           className:"error",
           text:"Reload"});
           a.onclick = httpGet;
-          d.push(a, dt);
-          d.push(dt, dl);
+        d.push(a, elm);
       }
       
       coll = g.msg.properties;
       for(var prop in coll) { 
         // only show properties from the profile
         if(sop[prop] && sop[prop].display===true) {
-          p = d.data({
+          tr_data = d.data_row({
             className:"item "+g.msg.class.join(" ")||"",
             text:sop[prop].prompt+"&nbsp;",
             value:coll[prop]+"&nbsp;"
           });
-          d.push(p,dd);
+          d.push(tr_data,table);
         }
         else { 
           // if we're in error mode, show them all
           if(cls==="error") {
-            p = d.data({
+            tr_data = d.data_row({
               className:"item "+g.msg.class.join(" ")||"",
               text:prop+"&nbsp;",
               value:coll[prop]+"&nbsp;"
             });
-            d.push(p,dd);
+            d.push(tr_data,table);
           }
         }
       }
-      d.push(dd, dl);
-      d.push(dl, elm);
+      if (table.hasChildNodes()) {
+        d.push(table, elm);
+      }
+
+      if (elm.hasChildNodes()) {
+        elm.style.display = "block";
+      } else {
+        elm.style.display = "none";
+      }
     }
   }  
 

@@ -11,18 +11,37 @@
   -->
   <head>
     <title>Siren</title>
-    <link href="siren-client.css" rel="stylesheet" />
+    <link href="semantic.min.css" rel="stylesheet" />
+    <style>
+    /** hidden by default **/
+    #properties, #entities, #dump { display: none; }
+    @media only screen and (max-width:767px) {
+      .ui.stackable.grid > .column:not(.row) {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }
+    }
+    </style>
   </head>
   <body>
-    <h1 id="title"></h1>
     <div id="links"></div>
-    <div id="error"></div>
-    <div id="content"></div>
-    <div id="properties"></div>
-    <div id="entities"></div>
-    <div id="actions"></div>
-    <div>
-      <pre id="dump"></pre>
+    <div style="margin: 5em 1em">
+      <h1 id="title" class="ui page header"></h1>
+      <div id="error"></div>
+      <div id="content" style="margin-bottom: 1em"></div>
+
+      <div class="ui mobile reversed two column stackable grid">
+        <div class="column">
+          <div id="properties" class="ui segment"></div>
+          <div id="entities" class="ui segments" style="margin-top: 0"></div>
+        </div>
+        <div class="column">
+          <div id="actions"></div>
+        </div>
+      </div>
+      <div>
+        <pre id="dump"></pre>
+      </div>
     </div>
   </body>
   <script src="dom-help.js">//na</script>  
